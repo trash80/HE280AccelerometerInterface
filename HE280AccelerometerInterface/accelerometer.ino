@@ -7,7 +7,7 @@
 
 
 #define ACCELEROMETER_I2C_ADDR 0x19
-#define Z_PROBE_SENSITIVITY  14 // 0-126 7 bit value  
+#define Z_PROBE_SENSITIVITY  12 // 0-126 7 bit value  
 
 void accelerometer_send(uint8_t val)
 {

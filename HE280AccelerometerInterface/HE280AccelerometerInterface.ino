@@ -16,13 +16,14 @@ void setup() {
 void loop() {
   if(!digitalRead(click_pin)) {
     digitalWrite(trigger_pin,HIGH);
-    delay(50);
+    delay(100);
     digitalWrite(trigger_pin,LOW);
-    uint8_t data = accelerometer_read(0x31);
+    accelerometer_read(0x31);
   }
   if(!digitalRead(reset_pin)) {
     if(!resetSwitch) {
       resetSwitch = true;
+      accelerometer_read(0x31);
       accelerometer_init();
       delay(1500);
     }

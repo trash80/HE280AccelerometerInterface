@@ -5,6 +5,7 @@
  * 
  */
 
+#include <Arduino.h>
 
 #define ACCELEROMETER_I2C_ADDR 0x19
 #define Z_PROBE_SENSITIVITY  12 // 0-126 7 bit value  
@@ -28,7 +29,7 @@ void accelerometer_write(uint8_t reg, uint8_t val)
     //Com::printFLN(PSTR("accelerometer write i2c error."));
 }
 
-uint8_t accelerometer_read(uint8_t reg)
+int accelerometer_read(uint8_t reg)
 {
   uint8_t receiveByte;
 
@@ -50,6 +51,7 @@ uint8_t accelerometer_read(uint8_t reg)
   else
   {
     Serial.println("i2c recv error.");
+    return -1;
   }
 }
 

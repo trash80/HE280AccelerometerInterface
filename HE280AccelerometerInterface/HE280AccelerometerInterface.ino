@@ -1,4 +1,5 @@
 #include <Wire.h>
+#include "accelerometer.h"
 
 uint8_t click_pin = 2; // "INT" interrupt pin from HE280 - Blue on my model
 uint8_t reset_pin = 3; // Used to re-send the initialization code to the HE280's accelerometer. Z Probe Mod pin.

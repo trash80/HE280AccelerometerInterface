@@ -1,12 +1,13 @@
 #include <Wire.h>
 
 #define Z_PROBE_SENSITIVITY  12 // Seemecnc's default is 20, 15 is a good middle ground, 0-126 7 bit value
-#define USE_RESET_PIN 1 // Comment out this line to not use the reset pin for reinitializing the probe
-#define DEBUG 1 // Comment out this line to not echo results to serial
 
 const uint8_t click_pin = 2; // "INT" interrupt pin from HE280 - Blue on my model
 const uint8_t reset_pin = 3; // Used to re-send the initialization code to the HE280's accelerometer. Z Probe Mod pin.
 const uint8_t trigger_pin = 13; // Sends a HIGH signal when probe touches the table. Connected to Duet's Z probe in. Duet set to Type: 5.
+
+#define USE_RESET_PIN 1 // Comment out this line to not use the reset pin for reinitializing the probe
+#define DEBUG 1 // Comment out this line to not echo results to serial
 
 boolean resetSwitch = false;
 

@@ -26,6 +26,8 @@ void setup() {
     digitalWrite(trigger_pin,HIGH); // Keep HIGH so that travel stops
     delay(50);
   }
+  
+  digitalWrite(trigger_pin,LOW);
 }
 
 void loop() {
@@ -50,6 +52,8 @@ void loop() {
         digitalWrite(trigger_pin,HIGH); // Keep HIGH so that travel stops
         delay(50);
       }
+      
+      digitalWrite(trigger_pin,LOW);
       
       delay(1500);
     }

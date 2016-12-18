@@ -107,9 +107,9 @@ bool accelerometer_recv(uint8_t reg)
   if(Wire.available()) {
     receiveByte = Wire.read(); 
 
-    debug_print("read reg ");
+    debug_print("Read REG: ");
     debug_printf(reg, HEX);
-    debug_print("Value: ");
+    debug_print(" Value: ");
     debug_printlnf(receiveByte, HEX);
 
     return true;

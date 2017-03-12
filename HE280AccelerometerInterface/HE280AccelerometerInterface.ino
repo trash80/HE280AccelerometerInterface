@@ -1,7 +1,7 @@
 #include <Wire.h>
 #include "Trash80_IIS2DH.h"
 
-#define Z_PROBE_SENSITIVITY 20 // 0-126 7 bit value
+#define Z_PROBE_SENSITIVITY 20 // 23@8g, 43&4g, 0-126 7 bit value
 
 const uint8_t click_pin = 2; // "INT" interrupt pin from HE280 - Blue on my model
 const uint8_t mod_pin = 3; // Used to arm the probe. Z Probe Mod pin.
@@ -9,9 +9,16 @@ const uint8_t trigger_pin = 13; // Sends a HIGH signal when probe touches the ta
 
 Trash80_IIS2DH accel = Trash80_IIS2DH();
 
+#define NUM_PROBE_POINTS 13
+
 uint8_t lastState = false;
 
 unsigned long activationWindow;
+
+float triggerTime = 0;
+float lastTriggerTime = 0;
+float probeData[32][13];
+uint8_t counter = 0;
 
 void setup() {
   pinMode(click_pin, INPUT);
@@ -75,6 +82,7 @@ void loop() {
   uint8_t state = digitalReadFast(mod_pin);
   
   if(state != lastState) {
+    // Disable accelerometer by setting a high threshold
     if(state) {
       activationWindow = millis() + 100;
     } else {
@@ -100,6 +108,27 @@ void loop() {
     
     digitalWriteFast(trigger_pin,HIGH);
     accel.setInt1Threshold(127);
+    
+    counter++;
+    
+    lastTriggerTime = triggerTime;
+    triggerTime = millis();
+    if((triggerTime - lastTriggerTime) >= 10000) counter = 1; //reset counter if last move was longer than 10 seconds ago
+    
+    if (counter <= NUM_PROBE_POINTS) {
+      print32Fifo(counter);
+    }
+    
+    Serial.print("#");
+    Serial.print(counter);
+    Serial.print(" ");
+    
+    if (counter == NUM_PROBE_POINTS) {
+      // all done so print data and reset counter
+      Serial.println("");
+      print32(-1);
+      counter = 0;
+    }
 
     delay(50);
 
@@ -107,5 +136,43 @@ void loop() {
     accel.fifoReset(); // reset FIFO
     accel.setFifoMode(3);
     digitalWrite(trigger_pin,LOW);
+  }
+}
+
+void print32(int row) {
+  if (row == -1){
+    for (int i = 0; i < 13; i++) {
+      for (int j = 0; j < 32; j++) {
+        Serial.print(probeData[j][i]);
+        Serial.print("\t");
+      }
+      Serial.println("");
+    } 
+  } else {
+    for (int n = 0; n < 32; n++) {
+      uint8_t ZHigh = accel.read(2);
+      float av = (ZHigh * 32.0) / 1000.0;
+      probeData[n][row-1] = av;
+    }
+  }
+}
+
+void print32Fifo(int row) {
+  if (row == -1){
+    for (int i = 0; i < 13; i++) {
+      for (int j = 0; j < 32; j++) {
+        Serial.print(probeData[j][i]);
+        Serial.print("\t");
+      }
+      Serial.println("");
+    } 
+  } else if(accel.fifoAvailable()) {
+    int n=0;
+    while(accel.fifoUnreadSamples() && n <= 31) {
+      int z = accel.read(2);
+      float av = (z*32) / 1000.0;
+      probeData[n++][row-1] = av;
+    }
+    accel.fifoReset(); // reset FIFO
   }
 }
